@@ -54,7 +54,10 @@ protected:
 
 // send: send a Modbus message in either format (ModbusMessage or data/len)
   static void send(HardwareSerial& serial, uint32_t& lastMicros, uint32_t interval, int rtsPin, const uint8_t *data, uint16_t len);
+  static void send(HardwareSerial& serial, uint32_t& lastMicros, uint32_t interval, std::function<void( bool level)> _RTSPinCB, const uint8_t *data, uint16_t len);
   static void send(HardwareSerial& serial, uint32_t& lastMicros, uint32_t interval, int rtsPin, ModbusMessage raw);
+  static void send(HardwareSerial& serial, uint32_t& lastMicros, uint32_t interval, std::function<void( bool level)> _RTSPinCB, ModbusMessage raw);
+  
 };
 
 #endif

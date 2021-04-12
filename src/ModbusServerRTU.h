@@ -33,6 +33,9 @@ public:
   // stop: kill server task
   bool stop();
 
+  // If the RTS pin is external, then call the external function to set the RTS pin low/high.
+  // Use this for example when the RE/DE pin is connected to an IO expander
+  void          setRTSPinCallback( std::function<void( bool level)> func );
 protected:
   // Prevent copy construction and assignment
   ModbusServerRTU(ModbusServerRTU& m) = delete;
@@ -51,6 +54,7 @@ protected:
   uint32_t MSRinterval;                  // Bus quiet time between messages
   uint32_t MSRlastMicros;                // microsecond time stamp of last bus activity
   uint32_t MSRrtsPin;                    // GPIO number of the RS485 module's RE/DE line
+  std::function<void( bool level)> _setRTSPin; // Callback reference for the RS485 RE/DE line.
 
   // serve: loop function for server task
   static void serve(ModbusServerRTU *myself);
