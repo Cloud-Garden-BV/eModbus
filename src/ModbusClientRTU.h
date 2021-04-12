@@ -62,6 +62,7 @@ Error addRequest(uint32_t token, Args&&... args) {
 
   // Set default timeout value for interface
   void setTimeout(uint32_t TOV);
+  void setRTSPinCallback( std::function<void( bool level)> func );
 
 protected:
   struct RequestEntry {
@@ -90,6 +91,7 @@ protected:
   uint32_t MR_lastMicros;         // Microseconds since last bus activity
   uint32_t MR_interval;           // Modbus RTU bus quiet time
   int8_t MR_rtsPin;               // GPIO pin to toggle RS485 DE/RE line. -1 if none.
+  std::function<void( bool level)> _RTSPinCB; // Callback reference for the RS485 RE/DE line.
   uint16_t MR_qLimit;             // Maximum number of requests to hold in the queue
   uint32_t MR_timeoutValue;       // Interface default timeout
 
