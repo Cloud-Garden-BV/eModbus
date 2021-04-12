@@ -40,7 +40,7 @@ protected:
 #endif
   MBOnData onData;                 // Response data handler
   MBOnError onError;               // Error response handler
-  static uint16_t instanceCounter; // Number of ModbusClients created
+  static uint8_t instanceCounter; // Number of ModbusClients created
 };
 
 #endif

@@ -6,7 +6,7 @@
 #undef LOCAL_LOG_LEVEL
 #include "Logging.h"
 
-uint16_t ModbusClient::instanceCounter = 0;
+uint8_t ModbusClient::instanceCounter = 0;
 
 // Default constructor: set the default timeout to 2000ms, zero out all other 
 ModbusClient::ModbusClient() :
