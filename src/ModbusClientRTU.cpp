@@ -22,7 +22,13 @@ ModbusClientRTU::ModbusClientRTU(HardwareSerial& serial, int8_t rtsPin, uint16_t
     // Switch serial FIFO buffer copy threshold to 1 byte (normally is 112!)
     RTUutils::UARTinit(serial, 1);
 }
-
+void ModbusClientRTU::setRTSPinCallback( std::function<void( bool level)> func ) {
+  _RTSPinCB = func;
+  // If valid, then set it low, since that's the "default"
+  if(_RTSPinCB !=NULL) {
+        _RTSPinCB(LOW); // Set the external RE/DE pin low when starting
+  }
+}
 // Destructor: clean up queue, task etc.
 ModbusClientRTU::~ModbusClientRTU() {
   // Clean up queue

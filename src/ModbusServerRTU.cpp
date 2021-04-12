@@ -36,10 +36,10 @@ ModbusServerRTU::ModbusServerRTU(HardwareSerial& serial, uint32_t timeout, int r
 ModbusServerRTU::~ModbusServerRTU() {
 }
 void ModbusServerRTU::setRTSPinCallback( std::function<void( bool level)> func ) {
-  _setRTSPinCB = func;
+  _RTSPinCB = func;
   // If valid, then set it low, since that's the "default"
-  if(_setRTSPinCB !=NULL) {
-        _setRTSPinCB(LOW); // Set the external RE/DE pin low when starting
+  if(_RTSPinCB !=NULL) {
+        _RTSPinCB(LOW); // Set the external RE/DE pin low when starting
   }
 }
 

@@ -41,6 +41,8 @@ protected:
   MBOnData onData;                 // Response data handler
   MBOnError onError;               // Error response handler
   static uint8_t instanceCounter; // Number of ModbusClients created
+  std::function<void( bool level)> _RTSPinCB; // Callback reference for the RS485 RE/DE line.
+
 };
 
 #endif

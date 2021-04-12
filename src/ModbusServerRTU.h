@@ -54,7 +54,7 @@ protected:
   uint32_t MSRinterval;                  // Bus quiet time between messages
   uint32_t MSRlastMicros;                // microsecond time stamp of last bus activity
   uint32_t MSRrtsPin;                    // GPIO number of the RS485 module's RE/DE line
-  std::function<void( bool level)> _setRTSPinCB; // Callback reference for the RS485 RE/DE line.
+  std::function<void( bool level)> _RTSPinCB; // Callback reference for the RS485 RE/DE line.
 
   // serve: loop function for server task
   static void serve(ModbusServerRTU *myself);
