@@ -11,6 +11,7 @@
 #include <vector>
 #include "HardwareSerial.h"
 #include "ModbusTypeDefs.h"
+#include <functional>
 
 using namespace Modbus;  // NOLINT
 

@@ -167,7 +167,7 @@ void RTUutils::send(HardwareSerial& serial, uint32_t& lastMicros, uint32_t inter
   uint16_t crc16 = calcCRC(data, len);
   while (micros() - lastMicros < interval) delayMicroseconds(1);  // respect _interval
   // Toggle rtsPin, if necessary
-  if(_setRTSPinCB !=NULL) {_setRTSPinCB(HIGH);   }
+  if(_RTSPinCB !=NULL) {_RTSPinCB(HIGH);   }
   // Write message
   serial.write(data, len);
   // Write CRC in LSB order
@@ -175,7 +175,7 @@ void RTUutils::send(HardwareSerial& serial, uint32_t& lastMicros, uint32_t inter
   serial.write((crc16 >> 8) & 0xFF);
   serial.flush();
   // Toggle rtsPin, if necessary
-  if(_setRTSPinCB !=NULL) {_setRTSPinCB(LOW); }
+  if(_RTSPinCB !=NULL) {_RTSPinCB(LOW); }
 
   HEXDUMP_D("Sent packet", data, len);
 
