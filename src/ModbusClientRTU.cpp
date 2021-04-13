@@ -25,6 +25,7 @@ ModbusClientRTU::ModbusClientRTU(HardwareSerial& serial, int8_t rtsPin, uint16_t
 void ModbusClientRTU::setRTSPinCallback( std::function<void( bool level)> func ) {
   _RTSPinCB = func;
   // If valid, then set it low, since that's the "default"
+  LOG_D("Set RTS pin callback.\n");
   if(_RTSPinCB !=NULL) {
         _RTSPinCB(LOW); // Set the external RE/DE pin low when starting
   }
@@ -132,10 +133,11 @@ void ModbusClientRTU::handleConnection(ModbusClientRTU *instance) {
       LOG_D("Pulled request from queue\n");
 
       // Send it via Serial
+      // if there is a RTS callback registered, then use that
       if(instance->_RTSPinCB!=NULL){
-        RTUutils::send(instance->MR_serial, instance->MR_lastMicros, instance->MR_interval, instance->MR_rtsPin, request.msg);
-      }else{
         RTUutils::send(instance->MR_serial, instance->MR_lastMicros, instance->MR_interval, instance->_RTSPinCB, request.msg);
+      }else{ // otherwise, directly toggle the RTS pin.
+        RTUutils::send(instance->MR_serial, instance->MR_lastMicros, instance->MR_interval, instance->MR_rtsPin, request.msg);
       }
 
       LOG_D("Request sent.\n");

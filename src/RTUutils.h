@@ -43,12 +43,14 @@ public:
 
 // addCRC: extend a RTUMessage by a valid CRC
   static void addCRC(ModbusMessage& raw);
+  
+  // UARTinit: modify the UART FIFO copy trigger threshold 
+  static int UARTinit(HardwareSerial& serial, int thresholdBytes = 1);
 
 protected:
   RTUutils() = delete;
 
-// UARTinit: modify the UART FIFO copy trigger threshold 
-  static int UARTinit(HardwareSerial& serial, int thresholdBytes = 1);
+
 
 // receive: get a Modbus message from serial, maintaining timeouts etc.
   static ModbusMessage receive(HardwareSerial& serial, uint32_t timeout, uint32_t& lastMicros, uint32_t interval);
