@@ -132,7 +132,11 @@ void ModbusClientRTU::handleConnection(ModbusClientRTU *instance) {
       LOG_D("Pulled request from queue\n");
 
       // Send it via Serial
-      RTUutils::send(instance->MR_serial, instance->MR_lastMicros, instance->MR_interval, instance->MR_rtsPin, request.msg);
+      if(instance->_RTSPinCB!=NULL){
+        RTUutils::send(instance->MR_serial, instance->MR_lastMicros, instance->MR_interval, instance->MR_rtsPin, request.msg);
+      }else{
+        RTUutils::send(instance->MR_serial, instance->MR_lastMicros, instance->MR_interval, instance->_RTSPinCB, request.msg);
+      }
 
       LOG_D("Request sent.\n");
       // HEXDUMP_V("Data", request.msg.data(), request.msg.size());

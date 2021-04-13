@@ -8,6 +8,7 @@
 #include "options.h"
 
 #include "ModbusMessage.h"
+#include <functional>
 
 #if HAS_FREERTOS
 extern "C" {
