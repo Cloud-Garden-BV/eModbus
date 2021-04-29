@@ -108,6 +108,8 @@ public:
   uint8_t getServerID();      // returns Server ID or 0 if MM_data is shorter than 3
   uint8_t getFunctionCode();  // returns FC or 0 if MM_data is shorter than 3
   Error   getError();         // getError() - returns error code (MM_data[2], if MM_data[1] > 0x7F, else SUCCESS)
+  uint8_t getSerialConfig();  // gets the serial configuration in uint_8 format (so serial config-0x8000000)
+  uint32_t getBaudrate();     // Gets the baudrate
 
   // Modbus data manipulation
   void    setServerID(uint8_t serverID); // Change server ID
@@ -173,6 +175,10 @@ uint16_t get(uint16_t index, double& v, int swapRules = 0);
   // 3. two uint16_t parameters (FC 0x01, 0x02, 0x03, 0x04, 0x05, 0x06)
   Error setMessage(uint8_t serverID, uint8_t functionCode, uint16_t p1, uint16_t p2);
   
+  // 3b. two uint16_t parameters (FC 0x01, 0x02, 0x03, 0x04, 0x05, 0x06)
+  // The config is the configuration parameter, subtracted by 0x8000000. So SERIAL_8E1 (0x800001e) will become 0x1E.
+  Error setMessage(uint8_t serverID, uint8_t functionCode, uint16_t p1, uint16_t p2, uint32_t baudrate, uint8_t config);
+
   // 4. three uint16_t parameters (FC 0x16)
   Error setMessage(uint8_t serverID, uint8_t functionCode, uint16_t p1, uint16_t p2, uint16_t p3);
   
@@ -185,8 +191,14 @@ uint16_t get(uint16_t index, double& v, int swapRules = 0);
   // 7. generic constructor for preformatted data ==> count is counting bytes!
   Error setMessage(uint8_t serverID, uint8_t functionCode, uint16_t count, uint8_t *arrayOfBytes);
 
+  // 7b. generic constructor for preformatted data ==> count is counting bytes! This one also sets the serial configuration
+  Error setMessage(uint8_t serverID, uint8_t functionCode, uint16_t count, uint8_t *arrayOfBytes, uint32_t baudrate, uint8_t config);
+
   // 8. error response
   Error setError(uint8_t serverID, uint8_t functionCode, Error errorCode);
+
+  // Sets the serial configuration, that will be checked during comms
+  Error setSerialConfig(uint32_t baudrate, uint8_t config);
   
 protected:
   // Data validation methods - used by the above!
@@ -218,6 +230,8 @@ protected:
   static void printError(const char *file, int lineNo, Error e);
 
   std::vector<uint8_t> MM_data;  // Message data buffer
+  uint32_t serialBaudrate = 0; // baudrate
+  uint8_t serialConfig = 0; // the "Arduino"-way of defining serial configuration (SERIAL_8N1 etc), only the last byte, so 0x1C / dec 28 is SERIAL_8N1
 
   static uint8_t floatOrder[sizeof(float)]; // order of bytes in a float variable
   static uint8_t doubleOrder[sizeof(double)]; // order of bytes in a double variable

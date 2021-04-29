@@ -135,6 +135,14 @@ Error ModbusMessage::getError() {
   // Default: everything OK - SUCCESS
   return SUCCESS;
 }
+// gets the serial configuration in uint_8 format (so serial config-0x8000000)
+uint8_t ModbusMessage::getSerialConfig() {
+    return serialConfig;
+}
+// Gets the baudrate
+uint32_t ModbusMessage::getBaudrate() {
+    return serialBaudrate;
+}
 
 // Modbus data manipulation
 void    ModbusMessage::setServerID(uint8_t serverID) {
@@ -712,6 +720,23 @@ Error ModbusMessage::setMessage(uint8_t serverID, uint8_t functionCode, uint16_t
   }
   return returnCode;
 }
+// 3b. two uint16_t parameters (FC 0x01, 0x02, 0x03, 0x04, 0x05, 0x06)
+// The config is the configuration parameter, subtracted by 0x8000000. So SERIAL_8E1 (0x800001e) will become 0x1E.
+Error ModbusMessage::setMessage(uint8_t serverID, uint8_t functionCode, uint16_t p1, uint16_t p2, uint32_t baudrate, uint8_t config) {
+  // Check parameter for validity
+  Error returnCode = checkData(serverID, functionCode, p1, p2);
+  // No error? 
+  if (returnCode == SUCCESS)
+  {
+    // Yes, all fine. Create new ModbusMessage
+    MM_data.reserve(6);
+    MM_data.shrink_to_fit();
+    MM_data.clear();
+    add(serverID, functionCode, p1, p2);
+    setSerialConfig(baudrate, config); // add serial configuration
+  }
+  return returnCode;
+}
 
 // 4. three uint16_t parameters (FC 0x16)
 Error ModbusMessage::setMessage(uint8_t serverID, uint8_t functionCode, uint16_t p1, uint16_t p2, uint16_t p3) {
@@ -786,6 +811,33 @@ Error ModbusMessage::setMessage(uint8_t serverID, uint8_t functionCode, uint16_t
     }
   }
   return returnCode;
+}
+// 7b. generic constructor for preformatted data ==> count is counting bytes! This one also sets the serial configuration
+// The config is the configuration parameter, subtracted by 0x8000000. So SERIAL_8E1 (0x800001e) will become 0x1E.
+Error ModbusMessage::setMessage(uint8_t serverID, uint8_t functionCode, uint16_t count, uint8_t *arrayOfBytes, uint32_t baudrate, uint8_t config) {
+  // Check parameter for validity
+  Error returnCode = checkData(serverID, functionCode, count, arrayOfBytes);
+  // No error? 
+  if (returnCode == SUCCESS)
+  {
+    // Yes, all fine. Create new ModbusMessage
+    MM_data.reserve(2 + count);
+    MM_data.shrink_to_fit();
+    MM_data.clear();
+    add(serverID, functionCode);
+    for (uint8_t i = 0; i < count; ++i) {
+      add(arrayOfBytes[i]);
+    }
+    setSerialConfig(baudrate, config); // add serial configuration
+  }
+  return returnCode;
+}
+// 
+Error ModbusMessage::setSerialConfig(uint32_t baudrate, uint8_t config){
+  LOG_V("Request baud of %u with config %d", baudrate, config);
+  serialBaudrate = baudrate;
+  serialConfig = config;
+  return SUCCESS; // return no error. TODO: check for valid configurations?
 }
 
 // 8. Error response generator
