@@ -13,7 +13,7 @@
 #include "ModbusTypeDefs.h"
 #include <functional>
 #include "esp32-hal-uart.h"
-// #include "uart.h"
+#include "driver/uart.h"
 
 using namespace Modbus;  // NOLINT
 

@@ -103,28 +103,50 @@ void RTUutils::addCRC(ModbusMessage& raw) {
 
 // Changes the serial configuration.
 // TODO: handle the parity configuration
-void RTUutils::handleSerialConfig(HardwareSerial& serial, uint32_t& MR_interval, uint32_t newBaudrate, uint8_t newConfig){
+void RTUutils::handleSerialConfig(HardwareSerial& serial, uint32_t& MR_interval, uint32_t newBaudrate, uint8_t newConfig) {
     uint32_t currentBaud = serial.baudRate();
     // if the baudrate is different, and the new baud is not 0(unconfigured)
-    if (currentBaud != newBaudrate && newBaudrate!=0){
-      LOG_D("Current baud is %u, changing to %u\n", currentBaud, newBaudrate);
-      // Then change the baud
-      serial.updateBaudRate(newBaudrate);
-    } 
-    // UART_MUTEX_LOCK();
-    
-    // serial._uart
-    // do {} while (xSemaphoreTake(uart->lock, portMAX_DELAY) != pdPASS)
-    // uart->dev->conf0.val = config;
-    // #define TWO_STOP_BITS_CONF 0x3
-    // #define ONE_STOP_BITS_CONF 0x1
-
-    // if ( uart->dev->conf0.stop_bit_num == TWO_STOP_BITS_CONF) {
-    //     uart->dev->conf0.stop_bit_num = ONE_STOP_BITS_CONF;
-    //     uart->dev->rs485_conf.dl1_en = 1;
-    // }
-    // UART_MUTEX_UNLOCK();
-
+    if(newBaudrate==0&& newConfig ==0){
+      return; // no requested changes
+    }
+    if (currentBaud != newBaudrate && newBaudrate != 0) {
+        LOG_D("Current baud is %u, changing to %u\n", currentBaud, newBaudrate);
+        // Then change the baud
+        serial.updateBaudRate(newBaudrate);
+    }
+    if(newConfig ==0){
+      return; // no requested changes
+    }
+    uint32_t newFullConfig = newConfig + 0x8000000;
+    // Yes, it is. Try to identify the Serial/Serial1/Serial2 the user has provided.
+    // Is it Serial (UART0)?
+    if (&serial == &Serial) {
+        // Yes. get the current value and set ours instead
+        uint32_t currentConfig = UART0.conf0.val;
+        if(currentConfig!=0 && currentConfig!=newFullConfig){
+          LOG_W("Serial current config is %u (wanted: %u)\n", currentConfig, newFullConfig);
+          UART0.conf0.val = newFullConfig;
+        }
+        // No, but perhaps is Serial1?
+    } else if (&serial == &Serial1) {
+        // It is. Get the current value and set ours.
+        uint32_t currentConfig = UART1.conf0.val;
+        if(currentConfig!=0 && currentConfig!=newFullConfig){
+          LOG_W("Serial1 current config is %u (wanted: %u)\n", currentConfig, newFullConfig);
+          UART1.conf0.val = newFullConfig;
+        }
+        // No, but it may be Serial2
+    } else if (&serial == &Serial2) {
+        // Found it. Get the current value and set ours.
+        uint32_t currentConfig = UART2.conf0.val;
+        if(currentConfig!=0 && currentConfig!=newFullConfig){
+          LOG_W("Serial2 current config is %u (wanted: %u)\n", currentConfig, newFullConfig);
+          UART2.conf0.val = newFullConfig;
+        }
+        // None of the three, so we are at an end here
+    } else {
+        LOG_W("Unable to identify serial\n");
+    }
     // silent interval is at least 3.5x character time
     MR_interval = 35000000UL / serial.baudRate();  // 3.5 * 10 bits * 1000 µs * 1000 ms / baud
 }
