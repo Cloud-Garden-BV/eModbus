@@ -6,7 +6,7 @@
 #include "ModbusMessage.h"
 #include "RTUutils.h"
 #undef LOCAL_LOG_LEVEL
-#define LOCAL_LOG_LEVEL LOG_LEVEL_VERBOSE
+#define LOCAL_LOG_LEVEL LOG_LEVEL_WARNING
 #include "Logging.h"
 
 // calcCRC: calculate Modbus CRC16 on a given array of bytes
@@ -124,7 +124,7 @@ void RTUutils::handleSerialConfig(HardwareSerial& serial, uint32_t& MR_interval,
         // Yes. get the current value and set ours instead
         uint32_t currentConfig = UART0.conf0.val;
         if(currentConfig!=0 && currentConfig!=newFullConfig){
-          LOG_W("Serial current config is %u (wanted: %u)\n", currentConfig, newFullConfig);
+          LOG_I("Serial current config is %u (wanted: %u)\n", currentConfig, newFullConfig);
           UART0.conf0.val = newFullConfig;
         }
         // No, but perhaps is Serial1?
@@ -132,7 +132,7 @@ void RTUutils::handleSerialConfig(HardwareSerial& serial, uint32_t& MR_interval,
         // It is. Get the current value and set ours.
         uint32_t currentConfig = UART1.conf0.val;
         if(currentConfig!=0 && currentConfig!=newFullConfig){
-          LOG_W("Serial1 current config is %u (wanted: %u)\n", currentConfig, newFullConfig);
+          LOG_I("Serial1 current config is %u (wanted: %u)\n", currentConfig, newFullConfig);
           UART1.conf0.val = newFullConfig;
         }
         // No, but it may be Serial2
@@ -140,7 +140,7 @@ void RTUutils::handleSerialConfig(HardwareSerial& serial, uint32_t& MR_interval,
         // Found it. Get the current value and set ours.
         uint32_t currentConfig = UART2.conf0.val;
         if(currentConfig!=0 && currentConfig!=newFullConfig){
-          LOG_W("Serial2 current config is %u (wanted: %u)\n", currentConfig, newFullConfig);
+          LOG_I("Serial2 current config is %u (wanted: %u)\n", currentConfig, newFullConfig);
           UART2.conf0.val = newFullConfig;
         }
         // None of the three, so we are at an end here
