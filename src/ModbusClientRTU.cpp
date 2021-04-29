@@ -47,6 +47,23 @@ ModbusClientRTU::~ModbusClientRTU() {
   LOG_D("Worker task %d killed.\n", (uint32_t)worker);
 }
 
+// stop all related things
+void ModbusClientRTU::end() {
+  // Clean up queue
+  {
+    // Safely lock access
+    LOCK_GUARD(lockGuard, qLock);
+    // Get all queue entries one by one
+    while (!requests.empty()) {
+      // Remove front entry
+      requests.pop();
+    }
+  }
+  // Kill task
+  vTaskDelete(worker);
+  LOG_D("Worker task %d killed.\n", (uint32_t)worker);
+}
+
 // begin: start worker task
 void ModbusClientRTU::begin(int coreID) {
   // Only start worker if HardwareSerial has been initialized!

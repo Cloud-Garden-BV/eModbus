@@ -57,6 +57,7 @@ Error addRequest(uint32_t token, Args&&... args) {
   // Destructor: clean up queue, task etc.
   ~ModbusClientRTU();
 
+  void end();
   // begin: start worker task
   void begin(int coreID = -1);
 
