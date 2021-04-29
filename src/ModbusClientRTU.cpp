@@ -130,8 +130,9 @@ void ModbusClientRTU::handleConnection(ModbusClientRTU *instance) {
       // Yes. pull it.
       RequestEntry request = instance->requests.front();
 
-      LOG_D("Pulled request from queue\n");
-
+      LOG_D("Pulled request from queue with baud %u and conf %u\n",request.msg.getBaudrate(), request.msg.getSerialConfig());
+      // First check if the serial configuration is different from the current configuration, and change it if necessary
+      RTUutils::handleSerialConfig(instance->MR_serial, instance->MR_interval, request.msg.getBaudrate(), request.msg.getSerialConfig());
       // Send it via Serial
       // if there is a RTS callback registered, then use that
       if(instance->_RTSPinCB!=NULL){

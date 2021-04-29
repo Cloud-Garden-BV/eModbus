@@ -47,7 +47,7 @@ ModbusMessage& ModbusMessage::operator=(ModbusMessage&& m) {
 
 // Copy constructor
 ModbusMessage::ModbusMessage(const ModbusMessage& m) :
-  MM_data(m.MM_data) { }
+  MM_data(m.MM_data),serialBaudrate(m.serialBaudrate),serialConfig(m.serialConfig) { }
 
 // Equality comparison
 bool ModbusMessage::operator==(const ModbusMessage& m) {
@@ -834,7 +834,7 @@ Error ModbusMessage::setMessage(uint8_t serverID, uint8_t functionCode, uint16_t
 }
 // 
 Error ModbusMessage::setSerialConfig(uint32_t baudrate, uint8_t config){
-  LOG_V("Request baud of %u with config %d", baudrate, config);
+  LOG_V("Request baud of %u with config %d\n", baudrate, config);
   serialBaudrate = baudrate;
   serialConfig = config;
   return SUCCESS; // return no error. TODO: check for valid configurations?

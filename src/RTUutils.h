@@ -12,6 +12,8 @@
 #include "HardwareSerial.h"
 #include "ModbusTypeDefs.h"
 #include <functional>
+#include "esp32-hal-uart.h"
+// #include "uart.h"
 
 using namespace Modbus;  // NOLINT
 
@@ -46,6 +48,9 @@ public:
   
   // UARTinit: modify the UART FIFO copy trigger threshold 
   static int UARTinit(HardwareSerial& serial, int thresholdBytes = 1);
+
+  // handleSerialConfig: checks and sets the serial port to the correct baudrate.
+  static void handleSerialConfig(HardwareSerial& serial, uint32_t& MR_interval, uint32_t newBaudrate, uint8_t newConfig);
 
 protected:
   RTUutils() = delete;

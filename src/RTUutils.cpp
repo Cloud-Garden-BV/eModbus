@@ -6,7 +6,7 @@
 #include "ModbusMessage.h"
 #include "RTUutils.h"
 #undef LOCAL_LOG_LEVEL
-// #define LOCAL_LOG_LEVEL LOG_LEVEL_VERBOSE
+#define LOCAL_LOG_LEVEL LOG_LEVEL_VERBOSE
 #include "Logging.h"
 
 // calcCRC: calculate Modbus CRC16 on a given array of bytes
@@ -101,6 +101,33 @@ void RTUutils::addCRC(ModbusMessage& raw) {
   raw.push_back((crc16 >> 8) & 0xFF);
 }
 
+// Changes the serial configuration.
+// TODO: handle the parity configuration
+void RTUutils::handleSerialConfig(HardwareSerial& serial, uint32_t& MR_interval, uint32_t newBaudrate, uint8_t newConfig){
+    uint32_t currentBaud = serial.baudRate();
+    // if the baudrate is different, and the new baud is not 0(unconfigured)
+    if (currentBaud != newBaudrate && newBaudrate!=0){
+      LOG_D("Current baud is %u, changing to %u\n", currentBaud, newBaudrate);
+      // Then change the baud
+      serial.updateBaudRate(newBaudrate);
+    } 
+    // UART_MUTEX_LOCK();
+    
+    // serial._uart
+    // do {} while (xSemaphoreTake(uart->lock, portMAX_DELAY) != pdPASS)
+    // uart->dev->conf0.val = config;
+    // #define TWO_STOP_BITS_CONF 0x3
+    // #define ONE_STOP_BITS_CONF 0x1
+
+    // if ( uart->dev->conf0.stop_bit_num == TWO_STOP_BITS_CONF) {
+    //     uart->dev->conf0.stop_bit_num = ONE_STOP_BITS_CONF;
+    //     uart->dev->rs485_conf.dl1_en = 1;
+    // }
+    // UART_MUTEX_UNLOCK();
+
+    // silent interval is at least 3.5x character time
+    MR_interval = 35000000UL / serial.baudRate();  // 3.5 * 10 bits * 1000 µs * 1000 ms / baud
+}
 // UARTinit: modify the UART FIFO copy trigger threshold 
 // This is normally set to 112 by default, resulting in short messages not being 
 // recognized fast enough for higher Modbus bus speeds
