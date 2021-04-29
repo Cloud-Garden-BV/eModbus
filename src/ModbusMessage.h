@@ -230,8 +230,8 @@ protected:
   static void printError(const char *file, int lineNo, Error e);
 
   std::vector<uint8_t> MM_data;  // Message data buffer
-  uint32_t serialBaudrate; // baudrate
-  uint8_t serialConfig; // the "Arduino"-way of defining serial configuration (SERIAL_8N1 etc), only the last byte, so 0x1C / dec 28 is SERIAL_8N1
+  uint32_t serialBaudrate=0; // baudrate
+  uint8_t serialConfig=0; // the "Arduino"-way of defining serial configuration (SERIAL_8N1 etc), only the last byte, so 0x1C / dec 28 is SERIAL_8N1
 
   static uint8_t floatOrder[sizeof(float)]; // order of bytes in a float variable
   static uint8_t doubleOrder[sizeof(double)]; // order of bytes in a double variable
